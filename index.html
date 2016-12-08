@@ -78,15 +78,19 @@
                         //index not changed, so don't do anything
                         return;
                     }
+                    //save the last item dragged over
                     previousDragOver = dragOverLocation;
                     previousDragOverIndex = dragOverIndex;
                     //remove placeholders
                     removeDragPlaceholders(dragOverLocation);
 
-                    //don't do anything if dragged over location is same as item
+                    //don't do anything more if dragged over location is same as item
+                    //since there should no drag placeholder indicator
                     if(dragOverIndex === draggedItemIndex){
                         return;
                     }
+                    //display drag placeholder indicator
+
                     var dragParent = dragOverLocation.closest('[data-drag-reorder-list="true"]');
                     var dragListLength = dragParent.find('li[draggable="true"]').length;
                     //place drag location indicator
@@ -121,15 +125,13 @@
                         //if dragged over same item, don't do anything
                         return;
                     }
+                    //remove dragged item from dom
+                    draggedItem.detach();
                     //check index to see if should be before of after
-                    else if(draggedItemIndex > previousDragOverIndex){
-                        //remove dragged item from dom
-                        draggedItem.detach();
+                    if(draggedItemIndex > previousDragOverIndex){
                         previousDragOver.before(draggedItem);
                     }
                     else{
-                        //remove dragged item from dom
-                        draggedItem.detach();
                         previousDragOver.after(draggedItem);
                     }
                 });
