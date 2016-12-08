@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Drag and Drop Example</title>
+        <meta name="description" content="Drag and drop list items to reorder them"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <style type="text/css">
+        	[data-drag-reorder-list="true"]{
+        		list-style: none;
+        		padding-left: 0;
+        		border-collapse: collapse;
+        	}
+        	[data-drag-reorder-list="true"] li{
+        		padding: 1em;
+        		border: 1px solid black;
+        		border-bottom: 0;
+        	}
+        	[data-drag-reorder-list="true"] li:last-of-type{
+				border-bottom: 1px solid black;
+        	}
+        	.drag-placeholder{
+        		background-color: grey;
+        	}
+        </style>
+    </head>
+    <body>
+    	<ul data-drag-reorder-list="true">
+    		<li draggable="true">Item 1</li>
+    		<li draggable="true">Item 2</li>
+    		<li draggable="true">Item 3</li>
+    		<li draggable="true">Item 4</li>
+    		<li draggable="true">Item 5</li>
+    	</ul>
+
+
+    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    	<script>
+    		/*
+    		 * Drag to reorder list items
+    		 * based on: http://www.w3schools.com/html/html5_draganddrop.asp
+    		 */
+    		(function($){
+    			var draggedItem;
+    			var draggedItemIndex;
+
+    		    $('[data-drag-reorder-list="true"]').on('dragover', 'li[draggable="true"]', function(event) {
+    		    	//required so drop events fire
+    		    	event.preventDefault();
+
+    		    })
+    		    .on('dragstart', 'li[draggable="true"]', function(event) {
+    		    	//save dragged item to variable
+    		    	//can't use event.dataTransfer, because IE11 and Edge don't support this
+    		    	draggedItem = $(this);
+    		    	//save drapgedItem index before it is detached
+    		    	draggedItemIndex = draggedItem.index();
+    		    })
+    		    .on('drop', 'li[draggable="true"]', function(event) {
+    		    	event.preventDefault();
+    		    	//get element item was dragged on
+    		    	var dropLocation = $(this);
+    		    	var dropLocationIndex = dropLocation.index();
+    		    	//if dragged item was below location, add it above
+    		    	//drop location, otherwise add it after
+    		    	if(draggedItemIndex === dropLocationIndex){
+    		    		//if dragged over same item, don't do anything
+    		    		return;
+    		    	}
+    		    	else if(draggedItemIndex > dropLocationIndex){
+    		    		//remove dragged item from dom
+    		    		draggedItem.detach();
+    		    		dropLocation.before(draggedItem);
+    		    	}
+    		    	else{
+    		    		//remove dragged item from dom
+    		    		draggedItem.detach();
+    		    		dropLocation.after(draggedItem);
+    		    	}
+    		    });
+
+
+
+    		})(jQuery);
+    	</script>
+    </body>
+</html>
