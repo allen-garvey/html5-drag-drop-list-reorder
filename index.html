@@ -27,6 +27,12 @@
             .drag-placeholder-bottom{
                 margin-bottom: 4em;
             }
+            .drag-parent-placeholder-top{
+                padding-top: 4em;
+            }
+            .drag-parent-placeholder-bottom{
+                padding-bottom: 4em;
+            }
         </style>
     </head>
     <body>
@@ -54,7 +60,9 @@
                 //removes placeholders
                 //pass in jQuery object of item in list to remove placeholders
                 function removeDragPlaceholders($listItem){
-                    $listItem.closest('[data-drag-reorder-list="true"]').find('li[draggable="true"]')
+                    var dragParent = $listItem.closest('[data-drag-reorder-list="true"]');
+                    dragParent.removeClass('drag-parent-placeholder-top').removeClass('drag-parent-placeholder-bottom');
+                    dragParent.find('li[draggable="true"]')
                         .removeClass('drag-placeholder-bottom')
                         .removeClass('drag-placeholder-top');
                 }
@@ -79,8 +87,17 @@
                     if(dragOverIndex === draggedItemIndex){
                         return;
                     }
+                    var dragParent = dragOverLocation.closest('[data-drag-reorder-list="true"]');
+                    var dragListLength = dragParent.find('li[draggable="true"]').length;
                     //place drag location indicator
-                    if(draggedItemIndex > dragOverIndex){
+                    //for first and last items, need to alter parent, because margin won't show background color
+                    if(dragOverIndex === 0){
+                        dragParent.addClass('drag-parent-placeholder-top');
+                    }
+                    else if(dragOverIndex === dragListLength - 1){
+                        dragParent.addClass('drag-parent-placeholder-bottom');
+                    }
+                    else if(draggedItemIndex > dragOverIndex){
                         dragOverLocation.addClass('drag-placeholder-top');
                     }
                     else{
