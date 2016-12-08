@@ -10,18 +10,23 @@
         		list-style: none;
         		padding-left: 0;
         		border-collapse: collapse;
+                background-color: oldlace;
         	}
         	[data-drag-reorder-list="true"] li{
         		padding: 1em;
         		border: 1px solid black;
         		border-bottom: 0;
+                background-color: white;
         	}
         	[data-drag-reorder-list="true"] li:last-of-type{
 				border-bottom: 1px solid black;
         	}
-        	.drag-placeholder{
-        		background-color: grey;
+        	.drag-placeholder-top{
+        		margin-top: 4em;
         	}
+            .drag-placeholder-bottom{
+                margin-bottom: 4em;
+            }
         </style>
     </head>
     <body>
@@ -43,10 +48,18 @@
     		(function($){
     			var draggedItem;
     			var draggedItemIndex;
+                var previousDragOver;
                 var previousDragOverIndex;
-                //used to show where drap item will be placed
-                var dragPlaceholder = $('<li class="drag-placeholder"></li>');
 
+                //removes placeholders
+                //pass in jQuery object of item in list to remove placeholders
+                function removeDragPlaceholders($listItem){
+                    $listItem.closest('[data-drag-reorder-list="true"]').find('li[draggable="true"]')
+                        .removeClass('drag-placeholder-bottom')
+                        .removeClass('drag-placeholder-top');
+                }
+
+                //add placeholder and save item index when item is dragged over
     		    $('[data-drag-reorder-list="true"]').on('dragover', 'li[draggable="true"]', function(event) {
     		    	//required so drop events fire
     		    	event.preventDefault();
@@ -57,23 +70,24 @@
                         //index not changed, so don't do anything
                         return;
                     }
+                    previousDragOver = dragOverLocation;
                     previousDragOverIndex = dragOverIndex;
-                    //remove placeholder
-                    dragPlaceholder.detach();
+                    //remove placeholders
+                    removeDragPlaceholders(dragOverLocation);
+
                     //don't do anything if dragged over location is same as item
                     if(dragOverIndex === draggedItemIndex){
                         return;
                     }
                     //place drag location indicator
                     if(draggedItemIndex > dragOverIndex){
-                        dragOverLocation.before(dragPlaceholder);
+                        dragOverLocation.addClass('drag-placeholder-top');
                     }
                     else{
-                        dragOverLocation.after(dragPlaceholder);
+                        dragOverLocation.addClass('drag-placeholder-bottom');
                     }
-                    console.log(dragOverLocation);
-
     		    })
+                //initialize dragged item when it is dragged
     		    .on('dragstart', 'li[draggable="true"]', function(event) {
     		    	//save dragged item to variable
     		    	//can't use event.dataTransfer, because IE11 and Edge don't support this
@@ -81,31 +95,27 @@
     		    	//save drapgedItem index before it is detached
     		    	draggedItemIndex = draggedItem.index();
     		    })
-    		    .on('drop', 'li[draggable="true"]', function(event) {
-    		    	event.preventDefault();
-                    //remove placeholder
-                    dragPlaceholder.detach();
-    		    	//get element item was dragged on
-    		    	var dropLocation = $(this);
-    		    	var dropLocationIndex = dropLocation.index();
-    		    	//if dragged item was below location, add it above
-    		    	//drop location, otherwise add it after
-    		    	if(draggedItemIndex === dropLocationIndex){
-    		    		//if dragged over same item, don't do anything
-    		    		return;
-    		    	}
-    		    	else if(draggedItemIndex > dropLocationIndex){
-    		    		//remove dragged item from dom
-    		    		draggedItem.detach();
-    		    		dropLocation.before(draggedItem);
-    		    	}
-    		    	else{
-    		    		//remove dragged item from dom
-    		    		draggedItem.detach();
-    		    		dropLocation.after(draggedItem);
-    		    	}
-    		    });
-
+                //remove item placeholders and reorder items on drag end
+                .on('dragend', 'li[draggable="true"]', function(event) {
+                    //remove placeholders
+                    removeDragPlaceholders($(this));
+                    //change position of dragged item
+                    if(draggedItemIndex === previousDragOverIndex){
+                        //if dragged over same item, don't do anything
+                        return;
+                    }
+                    //check index to see if should be before of after
+                    else if(draggedItemIndex > previousDragOverIndex){
+                        //remove dragged item from dom
+                        draggedItem.detach();
+                        previousDragOver.before(draggedItem);
+                    }
+                    else{
+                        //remove dragged item from dom
+                        draggedItem.detach();
+                        previousDragOver.after(draggedItem);
+                    }
+                });
 
 
     		})(jQuery);
