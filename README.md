@@ -1,4 +1,4 @@
-# JavaScript List Item Drag and Drop Reorder
+# HTML5 Drag and Drop List Reorder
 
 Example to drag and drop list items in a list to reorder them.
 
@@ -14,4 +14,4 @@ Example to drag and drop list items in a list to reorder them.
 
 ## License
 
-JavaScript List Item Drag and Drop Reorder is released under the MIT License. See license.txt for more details.
+HTML5 Drag and Drop List Reorder is released under the MIT License. See license.txt for more details.
