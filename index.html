@@ -43,10 +43,35 @@
     		(function($){
     			var draggedItem;
     			var draggedItemIndex;
+                var previousDragOverIndex;
+                //used to show where drap item will be placed
+                var dragPlaceholder = $('<li class="drag-placeholder"></li>');
 
     		    $('[data-drag-reorder-list="true"]').on('dragover', 'li[draggable="true"]', function(event) {
     		    	//required so drop events fire
     		    	event.preventDefault();
+                    var dragOverLocation = $(this);
+                    var dragOverIndex = dragOverLocation.index();
+                    //check to see if drag over index is new
+                    if(previousDragOverIndex && previousDragOverIndex === dragOverIndex){
+                        //index not changed, so don't do anything
+                        return;
+                    }
+                    previousDragOverIndex = dragOverIndex;
+                    //remove placeholder
+                    dragPlaceholder.detach();
+                    //don't do anything if dragged over location is same as item
+                    if(dragOverIndex === draggedItemIndex){
+                        return;
+                    }
+                    //place drag location indicator
+                    if(draggedItemIndex > dragOverIndex){
+                        dragOverLocation.before(dragPlaceholder);
+                    }
+                    else{
+                        dragOverLocation.after(dragPlaceholder);
+                    }
+                    console.log(dragOverLocation);
 
     		    })
     		    .on('dragstart', 'li[draggable="true"]', function(event) {
@@ -58,6 +83,8 @@
     		    })
     		    .on('drop', 'li[draggable="true"]', function(event) {
     		    	event.preventDefault();
+                    //remove placeholder
+                    dragPlaceholder.detach();
     		    	//get element item was dragged on
     		    	var dropLocation = $(this);
     		    	var dropLocationIndex = dropLocation.index();
